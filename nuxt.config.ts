@@ -7,7 +7,7 @@ export default defineNuxtConfig({
     }
   },
   app: {
-    baseURL: '/nuxt-github-pages/',
+    baseURL: '/stronger/',
     buildAssetsDir: 'assets'
   },
   modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt'],
