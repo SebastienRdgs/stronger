@@ -51,7 +51,6 @@ const strongStore = useStrongStore();
 
 const {
   strongDatas,
-  strongHeaders,
 } = storeToRefs(strongStore);
 
 const data = ref(null as any);
