@@ -8,6 +8,7 @@ export default defineNuxtConfig({
   },
   app: {
     baseURL: '/nuxt-github-pages/',
+    buildAssetsDir: 'assets'
   },
   modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt'],
   plugins: [],
