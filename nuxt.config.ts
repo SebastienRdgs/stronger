@@ -6,6 +6,10 @@ export default defineNuxtConfig({
       version: process.env.VERSION || '0.0.1',
     }
   },
+  app: {
+    baseURL: '/nuxt-github-pages/',
+    buildAssetsDir: 'assets',
+  },
   modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt'],
   plugins: [],
 })
