@@ -9,14 +9,14 @@
         <label class="ml-2">3 lasts sets</label>
       </div>
     </div>
-    <div class="flex-1">
-      <Line v-if="loaded" :data="data" :options="options" />
+    <div class="flex flex-1 justify-center mt-2">
+      <Line :height="600" :width="350" v-if="loaded" :data="data" :options="options" />
+      <ul class="ml-2">
+        <li v-for="exercise in exerciseNames">
+          <c-button @click="selectExercice(exercise)">{{ exercise }}</c-button>
+        </li>
+      </ul>
     </div>
-    <ul>
-      <li v-for="exercise in exerciseNames">
-        <c-button @click="selectExercice(exercise)">{{ exercise }}</c-button>
-      </li>
-    </ul>
   </div>
 </template>
 
@@ -118,7 +118,8 @@ const exerciseNames = computed(() => {
 
 // Configure the chart options
 const options = {
-  responsive: true,
+  responsive: false,
+  maintainAspectRatio: false,
   scales: {
     x: {
       type: 'linear',
