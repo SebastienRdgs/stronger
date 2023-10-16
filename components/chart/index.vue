@@ -60,7 +60,7 @@ const checked = ref(false);
 
 const lastSets = () => {
   data.value = {
-    datasets: !checked.value ? strongStore.currentDataSet!.slice(0, 6) : strongStore.currentDataSet
+    datasets: !checked.value ? strongStore.currentDataSet!.slice((strongStore.currentDataSet?.length! - 6), strongStore.currentDataSet?.length!) : strongStore.currentDataSet
   }
   checked.value = !checked.value;
 }
@@ -85,22 +85,22 @@ const selectExercice = (exercise: string) => {
   uniqueDates.forEach((date, i) => {
     const dateData = exerciseData.filter((item) => (new Date(item.date)).toISOString() === date);
     const weightAndReps = dateData.map((item) => ({ x: item.seriesOrder, y: item.weight }));
-    const seriesNumber = dateData.map((item) => ({ x: item.seriesOrder, y: item.reps }));
+    // const seriesNumber = dateData.map((item) => ({ x: item.seriesOrder, y: item.reps }));
     
     result.push({
-      label: `${date.slice(0, 10)} (Weight and Reps)`,
+      label: `${date.slice(0, 10)}`,
       data: weightAndReps,
       backgroundColor: gradientColors[i],
       borderColor: gradientColors[i],
       pointRadius: 6,
     });
-    result.push({
-      label: `${date.slice(0, 10)} (Series Number)`,
-      data: seriesNumber,
-      backgroundColor: gradientColors[i],
-      borderColor: gradientColors[i],
-      fill: false,
-    });
+    // result.push({
+    //   label: `${date.slice(0, 10)} (Series Number)`,
+    //   data: seriesNumber,
+    //   backgroundColor: gradientColors[i],
+    //   borderColor: gradientColors[i],
+    //   fill: false,
+    // });
   });
   loaded.value = true;
   strongStore.currentDataSet = result;
@@ -116,7 +116,6 @@ const exerciseNames = computed(() => {
   return uniqueexerciseNames;
 });
 
-// Configure the chart options
 const options = {
   responsive: false,
   maintainAspectRatio: false,
@@ -125,25 +124,21 @@ const options = {
       type: 'linear',
       position: 'bottom',
       title: {
-        display: true,
+        display: false,
         text: 'Series Number',
       },
     },
     y: {
       type: 'linear',
       title: {
-        display: true,
+        display: false,
         text: 'Weight',
       },
     },
   },
-  legend: {
-    labels: {
-      filter: function (legendItem, chartData) {
-        console.log(legendItem)
-        // Filter the legend items to group them
-        return !legendItem.text.includes('(Series Number)'); // Modify as needed
-      },
+  plugins: {
+    legend: {
+      display: false
     },
   }
 };
