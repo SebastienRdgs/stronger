@@ -2,20 +2,22 @@
   <div>
     <div class="flex flex-1 justify-center items-center">
     </div>
-    <div v-if="selectedExercice" class="flex flex-1 justify-center items-center">
-      <div class="ml-2 font-bold" @click="unselectExercice()">{{ selectedExercice }} X</div>
-      <div class="ml-6 flex items-center">
+    <div class="flex flex-1 justify-center items-center">
+      <c-input-autocomplete
+        v-if="exerciseNames.length"
+        :openItemsWhenBlank="true"
+        class="mx-1 mt-1 p-1 font-bold"
+        :list="exerciseNames"
+        placeholder="Rechercher un exercice"
+        @input="selectExercice"
+      />
+      <div class="ml-6 flex items-center" v-if="selectedExercice">
         <c-input :type="'checkbox'" @click="lastSets()" />
         <label class="ml-2">3 lasts sets</label>
       </div>
     </div>
-    <div class="flex flex-1 justify-center mt-2">
-      <Line :height="600" :width="350" v-if="loaded" :data="data" :options="options" />
-      <ul class="ml-2">
-        <li v-for="exercise in exerciseNames">
-          <c-button @click="selectExercice(exercise)">{{ exercise }}</c-button>
-        </li>
-      </ul>
+    <div class="flex flex-1 justify-center mt-2" v-if="selectedExercice">
+      <Line :height="600" :width="width" v-if="loaded" :data="data" :options="options" />
     </div>
   </div>
 </template>
@@ -26,6 +28,7 @@ import { storeToRefs } from "pinia";
 import { useStrongStore } from "../../stores/strong.store";
 import { computed, ref } from 'vue';
 import { DataSet } from '../../types/strong';
+import { generateColorGradient, useIsMobile } from '../../helpers/chart';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -48,6 +51,7 @@ ChartJS.register(
 )
 
 const strongStore = useStrongStore();
+const isMobile = useIsMobile();
 
 const {
   strongDatas,
@@ -57,17 +61,14 @@ const data = ref(null as any);
 const loaded = ref(false);
 const selectedExercice = ref('');
 const checked = ref(false);
+const width = ref(isMobile ? 350 : 600);
+
 
 const lastSets = () => {
   data.value = {
     datasets: !checked.value ? strongStore.currentDataSet!.slice((strongStore.currentDataSet?.length! - 6), strongStore.currentDataSet?.length!) : strongStore.currentDataSet
   }
   checked.value = !checked.value;
-}
-
-const unselectExercice = () => {
-  selectedExercice.value = '';
-  loaded.value = false;
 }
 
 const selectExercice = (exercise: string) => {
@@ -84,7 +85,7 @@ const selectExercice = (exercise: string) => {
 
   uniqueDates.forEach((date, i) => {
     const dateData = exerciseData.filter((item) => (new Date(item.date)).toISOString() === date);
-    const weightAndReps = dateData.map((item) => ({ x: item.seriesOrder, y: item.weight }));
+    const weightAndReps = dateData.map((item) => ({ x: item.seriesOrder, y: item.weight, reps: item.reps }));
     // const seriesNumber = dateData.map((item) => ({ x: item.seriesOrder, y: item.reps }));
     
     result.push({
@@ -105,7 +106,7 @@ const selectExercice = (exercise: string) => {
   loaded.value = true;
   strongStore.currentDataSet = result;
   data.value = {
-    datasets: checked.value ? strongStore.currentDataSet.slice(0, 6) : strongStore.currentDataSet
+    datasets: checked.value ? strongStore.currentDataSet.slice((strongStore.currentDataSet?.length! - 6), strongStore.currentDataSet?.length!) : strongStore.currentDataSet
   }
   selectedExercice.value = exercise;
 }
@@ -118,7 +119,7 @@ const exerciseNames = computed(() => {
 
 const options = {
   responsive: false,
-  maintainAspectRatio: false,
+  maintainAspectRatio: true,
   scales: {
     x: {
       type: 'linear',
@@ -140,63 +141,22 @@ const options = {
     legend: {
       display: false
     },
-  }
+    tooltip: {
+      callbacks: {
+        label: function (tooltipItem: any) {
+          return tooltipItem.dataset.label + ": " + tooltipItem.raw.y + 'kg x ' + tooltipItem.dataset.data[tooltipItem.dataIndex].reps;
+        },
+        labelColor: function (context: any) {
+                    return {
+                      backgroundColor: "green",
+                    };
+                  },
+              },
+        labelTextColor: function (context: any) {
+          return 'yellow';
+        },
+    },
+  },
 };
-
-function generateColorGradient(steps: number): string[] {
-  const colors = [
-    "#00ff00",   // Green
-    "#90ee90",   // Light Green
-    "#add8e6",   // Light Blue
-    "#0000ff",   // Blue
-    "#800080",   // Purple
-    "#ff69b4",   // Pink
-    "#ff0000"    // Red
-  ];
-
-  const colorGradient: string[] = [];
-
-  // Calculate the number of steps between each color
-  const stepsBetweenColors = steps / (colors.length - 1);
-
-  for (let i = 0; i < steps; i++) {
-    const colorIndex = Math.floor(i / stepsBetweenColors);
-    const lowerColor = colors[colorIndex];
-    const upperColor = colors[colorIndex + 1];
-
-    // Calculate the interpolation factor
-    const interpolationFactor = (i % stepsBetweenColors) / stepsBetweenColors;
-
-    // Interpolate between the lower and upper colors
-    const interpolatedColor = interpolateColors(lowerColor, upperColor, interpolationFactor);
-    colorGradient.push(interpolatedColor);
-  }
-
-  return colorGradient;
-}
-
-function interpolateColors(color1: string, color2: string, factor: number): string {
-  const c1 = hexToRgb(color1);
-  const c2 = hexToRgb(color2);
-
-  const r = Math.round(c1.r + factor * (c2.r - c1.r));
-  const g = Math.round(c1.g + factor * (c2.g - c1.g));
-  const b = Math.round(c1.b + factor * (c2.b - c1.b));
-
-  return rgbToHex(r, g, b);
-}
-
-function hexToRgb(hex: string) {
-  const bigint = parseInt(hex.slice(1), 16);
-  const r = (bigint >> 16) & 255;
-  const g = (bigint >> 8) & 255;
-  const b = bigint & 255;
-  return { r, g, b };
-}
-
-function rgbToHex(r: number, g: number, b: number) {
-  return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
-}
-
 
 </script>
