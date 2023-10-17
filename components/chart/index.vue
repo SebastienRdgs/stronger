@@ -8,6 +8,7 @@
         :openItemsWhenBlank="true"
         class="mx-1 mt-1 p-1 font-bold"
         :list="exerciseNames"
+        attributeName="label"
         placeholder="Rechercher un exercice"
         @input="selectExercice"
       />
@@ -63,7 +64,6 @@ const selectedExercice = ref('');
 const checked = ref(false);
 const width = ref(isMobile ? 350 : 600);
 
-
 const lastSets = () => {
   data.value = {
     datasets: !checked.value ? strongStore.currentDataSet!.slice((strongStore.currentDataSet?.length! - 6), strongStore.currentDataSet?.length!) : strongStore.currentDataSet
@@ -71,10 +71,10 @@ const lastSets = () => {
   checked.value = !checked.value;
 }
 
-const selectExercice = (exercise: string) => {
+const selectExercice = (exercise: any) => {
   if (!strongDatas.value) return;
 
-  const exerciseData = strongDatas.value.filter((item) => item.exerciseName === exercise);
+  const exerciseData = strongDatas.value.filter((item) => item.exerciseName === exercise.name);
   const result: DataSet[] = [];
   const dates = exerciseData.map((item) => item.date);
 
@@ -86,7 +86,6 @@ const selectExercice = (exercise: string) => {
   uniqueDates.forEach((date, i) => {
     const dateData = exerciseData.filter((item) => (new Date(item.date)).toISOString() === date);
     const weightAndReps = dateData.map((item) => ({ x: item.seriesOrder, y: item.weight, reps: item.reps }));
-    // const seriesNumber = dateData.map((item) => ({ x: item.seriesOrder, y: item.reps }));
     
     result.push({
       label: `${date.slice(0, 10)}`,
@@ -95,13 +94,6 @@ const selectExercice = (exercise: string) => {
       borderColor: gradientColors[i],
       pointRadius: 6,
     });
-    // result.push({
-    //   label: `${date.slice(0, 10)} (Series Number)`,
-    //   data: seriesNumber,
-    //   backgroundColor: gradientColors[i],
-    //   borderColor: gradientColors[i],
-    //   fill: false,
-    // });
   });
   loaded.value = true;
   strongStore.currentDataSet = result;
@@ -110,11 +102,30 @@ const selectExercice = (exercise: string) => {
   }
   selectedExercice.value = exercise;
 }
+
 const exerciseNames = computed(() => {
-  const exerciseName = strongDatas.value?.map((item) => item.exerciseName);
-  const uniqueexerciseNames = [...new Set(exerciseName)];
-  uniqueexerciseNames.sort();
-  return uniqueexerciseNames;
+  const exerciseData = strongDatas.value;
+  const exerciseCount = {};
+
+  if (exerciseData) {
+    exerciseData.forEach((item) => {
+      const { date, exerciseName } = item;
+      const formattedDate = new Date(date).toISOString().split('T')[0];
+
+      if (!exerciseCount[exerciseName]) {
+        exerciseCount[exerciseName] = new Set();
+      }
+
+      exerciseCount[exerciseName].add(formattedDate);
+    });
+  }
+
+  const result = Object.keys(exerciseCount).map((exerciseName) => {
+    const uniqueDays = exerciseCount[exerciseName].size;
+    return { label: `${exerciseName} x ${uniqueDays}`, name: exerciseName };
+  });
+
+  return result;
 });
 
 const options = {
@@ -146,15 +157,7 @@ const options = {
         label: function (tooltipItem: any) {
           return tooltipItem.dataset.label + ": " + tooltipItem.raw.y + 'kg x ' + tooltipItem.dataset.data[tooltipItem.dataIndex].reps;
         },
-        labelColor: function (context: any) {
-                    return {
-                      backgroundColor: "green",
-                    };
-                  },
-              },
-        labelTextColor: function (context: any) {
-          return 'yellow';
-        },
+      },
     },
   },
 };
