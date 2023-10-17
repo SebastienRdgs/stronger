@@ -1,6 +1,6 @@
 <template>
   <div class="relative">
-    <c-input class="w-full" :placeholder="placeholder" v-model="search" @input="showItemsOrNot" custom-margin="mb-0" :closingIcon="list.length > 1" :error="error" :errors="errors" @close="reset" :autocomplete="autocomplete" />
+    <c-input class="w-full" :placeholder="placeholder" v-model="search" @input="showItemsOrNot" custom-margin="mb-0" :closingIcon="search.length > 1" :error="error" :errors="errors" @close="reset" :autocomplete="autocomplete" />
     <aside v-if="showSearchItems" class="absolute w-full z-50 bg-white dark:bg-neutral-500 border max-h-64 border-neutral-300 overflow-hidden overflow-y-scroll rounded-md shadow-md" role="menu" aria-labelledby="menu-heading">
       <ul class="flex flex-col w-full">
         <li

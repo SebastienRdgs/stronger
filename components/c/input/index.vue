@@ -22,6 +22,8 @@
         isFocusStyle || forceFocusPlaceholder ? 'text-[9px] top-1 px-1 left-0.5' : 'text-md']">
         {{ placeholder }}
       </span>
+
+      <span v-if="closingIcon" class="absolute mr-1 w-10 text-bold" @click="$emit('close')">X</span>
     </div>
     <span v-if="error" class="text-xs text-red-500">{{ errors?.join(',') }}</span>
   </div>
