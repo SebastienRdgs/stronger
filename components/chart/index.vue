@@ -14,7 +14,7 @@
       />
       <div class="ml-6 flex items-center" v-if="selectedExercice">
         <c-input :type="'checkbox'" @click="lastSets()" />
-        <label class="ml-2">3 lasts sets</label>
+        <label class="ml-2">5 lasts sets</label>
       </div>
     </div>
     <div class="flex flex-1 justify-center mt-2" v-if="selectedExercice">
@@ -66,7 +66,7 @@ const width = ref(isMobile ? 350 : 600);
 
 const lastSets = () => {
   data.value = {
-    datasets: !checked.value ? strongStore.currentDataSet!.slice((strongStore.currentDataSet?.length! - 6), strongStore.currentDataSet?.length!) : strongStore.currentDataSet
+    datasets: !checked.value ? strongStore.currentDataSet!.slice((strongStore.currentDataSet?.length! - 5), strongStore.currentDataSet?.length!) : strongStore.currentDataSet
   }
   checked.value = !checked.value;
 }
@@ -98,7 +98,7 @@ const selectExercice = (exercise: any) => {
   loaded.value = true;
   strongStore.currentDataSet = result;
   data.value = {
-    datasets: checked.value ? strongStore.currentDataSet.slice((strongStore.currentDataSet?.length! - 6), strongStore.currentDataSet?.length!) : strongStore.currentDataSet
+    datasets: checked.value ? strongStore.currentDataSet.slice((strongStore.currentDataSet?.length! - 5), strongStore.currentDataSet?.length!) : strongStore.currentDataSet
   }
   selectedExercice.value = exercise;
 }
