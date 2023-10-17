@@ -7,7 +7,7 @@ export const useIsMobile = function () {
 
 export function generateColorGradient(steps: number): string[] {
     const colors = [
-      "#ffffff",   // white
+      "#00ff00",   // white
       "#0000ff",   // Blue
       "#800080",   // Purple
       "#ff0000",    // Red
