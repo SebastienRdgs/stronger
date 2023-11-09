@@ -14,7 +14,7 @@ export interface Strong {
 
 export interface DataSet {
   label: string;
-  data: { x: number, y: number }[];
+  data: { x: number; y: number }[];
   borderColor?: string;
   borderWidth?: number;
   fill?: boolean;

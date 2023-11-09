@@ -4,12 +4,12 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       version: process.env.VERSION || '0.0.1',
-    }
+    },
   },
   app: {
     baseURL: '/stronger/',
-    buildAssetsDir: 'assets'
+    buildAssetsDir: 'assets',
   },
   modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt'],
   plugins: [],
-})
+});

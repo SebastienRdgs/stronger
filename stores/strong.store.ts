@@ -5,14 +5,15 @@ export const useStrongStore = defineStore('strong', {
   state: () => ({
     strongDatas: null as Strong[] | null,
     strongHeaders: null as string[] | null,
-    currentDataSet: null as DataSet[] | null
+    currentDataSet: null as DataSet[] | null,
+    currentDataSetVolume: null as DataSet[] | null,
   }),
   actions: {
     importDatas(csv: string) {
       const csvToArray = (csv: string) => {
         const lines = csv.split('\n');
         this.strongHeaders = lines[0].split(',').map((header: string) => header.replace(/^"(.*)"$/, '$1').trim());
-        
+
         return lines.slice(1, lines.length - 1).map((line: string) => {
           const values = line.split(',').map((value: string) => value.replace(/^"(.*)"$/, '$1').trim());
 
@@ -28,11 +29,11 @@ export const useStrongStore = defineStore('strong', {
           strongLine.seconds = parseFloat(values[8]);
           strongLine.notes = values[9];
           strongLine.trainingNotes = values[10];
-          
+
           return strongLine;
         });
       };
       this.strongDatas = csvToArray(csv);
-    }
-  }
-})
+    },
+  },
+});
