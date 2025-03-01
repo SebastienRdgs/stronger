@@ -8,24 +8,28 @@
         :disabled="disabled"
         :readonly="readonly"
         :checked="modelValue === true"
-        @input="emitValue($event.target?.value)"
         class="border rounded px-2 pt-4 pb-2 outline-neutral-500 w-full bg-inherit dark:text-white dark:border-neutral-500"
         :class="[
           error ? 'border-red-500' : 'border-neutral-300',
           disabled ? 'opacity-50 cursor-not-allowed' : 'opacity-100 cursor-pointer',
         ]"
+        @input="emitValue($event.target?.value)"
         @click="clickInput"
       />
       <slot />
-      <span :class="[
-        'absolute left-1 flex items-center pointer-events-none opacity-40 transition-all',
-        isFocusStyle || forceFocusPlaceholder ? 'text-[9px] top-1 px-1 left-0.5' : 'text-md']">
+      <span
+        :class="[
+          'absolute left-1 flex items-center pointer-events-none opacity-40 transition-all',
+          isFocusStyle || forceFocusPlaceholder ? 'text-[9px] top-1 px-1 left-0.5' : 'text-md',
+        ]"
+      >
         {{ placeholder }}
       </span>
+
+      <span v-if="closingIcon" class="absolute mr-1 w-10 text-bold" @click="$emit('close')">X</span>
     </div>
     <span v-if="error" class="text-xs text-red-500">{{ errors?.join(',') }}</span>
   </div>
-  
 </template>
 
 <script setup lang="ts">
@@ -49,14 +53,14 @@ const emit = defineEmits<{
 const focus = ref(false);
 const isFocusStyle = computed(() => {
   return props.modelValue || focus.value || props.type === 'number';
-})
+});
 
-const emitValue = async (value: string) => {
-  if(props.type === 'checkbox') return emit('update:modelValue', !props.modelValue);
-  if(props.type === 'number') return emit('update:modelValue', +value);
-  emit('update:modelValue', value)
+const emitValue = (value: string) => {
+  if (props.type === 'checkbox') return emit('update:modelValue', !props.modelValue);
+  if (props.type === 'number') return emit('update:modelValue', +value);
+  emit('update:modelValue', value);
 };
-const clickInput = async () => {
+const clickInput = () => {
   focus.value = true;
 };
 </script>
